@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VERITAS • Autonomous Research & Fact-Checking Engine</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+  <!-- Marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="theme-obsidian-emerald">
+  <!-- Background ambient glow -->
+  <div class="ambient-glow"></div>
+  <div class="grid-overlay"></div>
+
+  <div class="app-container">
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      <div class="nav-left">
+        <div class="brand-block">
+          <div class="brand-crest">
+            <span class="crest-glyph">◈</span>
+          </div>
+          <div>
+            <div class="brand-title-row">
+              <h1 class="brand-title">VERITAS</h1>
+              <span class="brand-tag">EVIDENCE ENGINE</span>
+              <span class="brand-version">v1.4</span>
+            </div>
+            <p class="brand-desc">Autonomous Multi-Source Web Triangulation • Claim Extraction • Conflict Arbiter</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <div class="sys-telemetry" id="providerStatusBadge">
+          <span class="telemetry-dot"></span>
+          <span class="telemetry-label" id="providerStatusText">GROQ // LLAMA-3.3-70B</span>
+        </div>
+        <button class="nav-btn" id="btnOpenClaimVerifier">
+          <span class="btn-icon">⚡</span>
+          <span>Quick Claim Check</span>
+        </button>
+        <button class="nav-btn nav-btn-outline" id="btnOpenSettings">
+          <span class="btn-icon">⚙</span>
+          <span>Engine Config</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-layout">
+      <!-- Search Input Section -->
+      <section class="research-input-card">
+        <div class="card-inner">
+          <div class="input-header-row">
+            <div class="header-prefix">
+              <span class="status-bracket">//</span>
+              <span class="header-tag">AUTONOMOUS INVESTIGATION BRIEF</span>
+            </div>
+            <span class="header-note">Autonomous Search • Page Scrape • Claim Cross-Exam • Conflict Resolution</span>
+          </div>
+
+          <form id="researchForm" class="research-form">
+            <div class="prompt-box">
+              <div class="prompt-prefix">›</div>
+              <textarea id="queryInput" placeholder="Enter a research topic, empirical question, or controversial claim to cross-verify across live web sources..." rows="2" required></textarea>
+            </div>
+
+            <div class="form-bottom-bar">
+              <div class="depth-bar">
+                <span class="depth-title">Triangulation Depth:</span>
+                <div class="depth-options">
+                  <label class="depth-toggle">
+                    <input type="radio" name="depth" value="quick">
+                    <span class="depth-pill">Fast (3 Sources)</span>
+                  </label>
+                  <label class="depth-toggle">
+                    <input type="radio" name="depth" value="balanced" checked>
+                    <span class="depth-pill">Standard (5 Sources)</span>
+                  </label>
+                  <label class="depth-toggle">
+                    <input type="radio" name="depth" value="deep">
+                    <span class="depth-pill">Deep (8 Sources)</span>
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" class="action-btn-primary" id="btnStartResearch">
+                <span class="btn-symbol">▶</span>
+                <span>DISPATCH INVESTIGATION</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Suggested Investigation Inquiries -->
+          <div class="preset-inquiries">
+            <span class="preset-title">INVESTIGATION TEMPLATES:</span>
+            <div class="preset-chips">
+              <button class="inquiry-chip" data-query="Impact of Artificial Intelligence on Global Employment: Net Job Loss or Job Creation?">
+                <span class="chip-accent">›</span> AI & Employment Net Impact
+              </button>
+              <button class="inquiry-chip" data-query="Solid-State EV Batteries: Commercial Viability Timeline and Energy Density Claims">
+                <span class="chip-accent">›</span> Solid-State Battery Commercialization
+              </button>
+              <button class="inquiry-chip" data-query="Lab-Grown Cultivated Meat: Carbon Footprint and Lifecycle Emissions vs Traditional Livestock">
+                <span class="chip-accent">›</span> Lab-Grown Meat Lifecycle Carbon
+              </button>
+              <button class="inquiry-chip" data-query="Are Microplastics Detectable in Human Blood and What Are the Documented Health Risks?">
+                <span class="chip-accent">›</span> Microplastics in Human Blood
+              </button>
+              <button class="inquiry-chip" data-query="Quantum Computing: Timeline and Feasibility for Breaking RSA-2048 Encryption">
+                <span class="chip-accent">›</span> Quantum Decryption Feasibility
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Execution Stepper & Progress -->
+      <section class="progress-section" id="progressSection" style="display: none;">
+        <div class="mission-status-card">
+          <div class="stepper-grid">
+            <div class="stepper-step" id="step-node-planning">
+              <div class="step-idx-badge">01</div>
+              <div class="step-meta">
+                <span class="step-name">DECOMPOSITION</span>
+                <span class="step-sub">Hypotheses & Query Plan</span>
+              </div>
+            </div>
+
+            <div class="stepper-line"></div>
+
+            <div class="stepper-step" id="step-node-searching">
+              <div class="step-idx-badge">02</div>
+              <div class="step-meta">
+                <span class="step-name">TOOL CALLING</span>
+                <span class="step-sub">Multi-Source Web Search</span>
+              </div>
+            </div>
+
+            <div class="stepper-line"></div>
+
+            <div class="stepper-step" id="step-node-extracting">
+              <div class="step-idx-badge">03</div>
+              <div class="step-meta">
+                <span class="step-name">SCRAPING</span>
+                <span class="step-sub">Deep Text Extraction</span>
+              </div>
+            </div>
+
+            <div class="stepper-line"></div>
+
+            <div class="stepper-step" id="step-node-claims">
+              <div class="step-idx-badge">04</div>
+              <div class="step-meta">
+                <span class="step-name">CLAIM MATRIX</span>
+                <span class="step-sub">Quotes & Stance Attribution</span>
+              </div>
+            </div>
+
+            <div class="stepper-line"></div>
+
+            <div class="stepper-step" id="step-node-conflicts">
+              <div class="step-idx-badge">05</div>
+              <div class="step-meta">
+                <span class="step-name">CONFLICT ARBITER</span>
+                <span class="step-sub">Discrepancy Resolution</span>
+              </div>
+            </div>
+
+            <div class="stepper-line"></div>
+
+            <div class="stepper-step" id="step-node-synthesis">
+              <div class="step-idx-badge">06</div>
+              <div class="step-meta">
+                <span class="step-name">REPORT SYNTHESIS</span>
+                <span class="step-sub">Cited Intelligence Report</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress Bar & Status Line -->
+          <div class="meter-wrapper">
+            <div class="meter-fill" id="progressBarFill" style="width: 5%;"></div>
+          </div>
+          <div class="telemetry-bar">
+            <div class="telemetry-left">
+              <span class="radar-ping" id="agentSpinner"></span>
+              <span class="telemetry-msg" id="currentStepText">Initializing autonomous evidence pipeline...</span>
+            </div>
+            <div class="telemetry-right">
+              <button class="terminal-toggle-btn" id="btnToggleTerminal">
+                <span class="toggle-glyph">▸</span>
+                <span>EXECUTION LOG</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Activity Log Drawer -->
+          <div class="terminal-drawer" id="terminalDrawer">
+            <div class="terminal-bar">
+              <span class="terminal-title">// TOOL CALL TELEMETRY & RUNTIME AUDIT</span>
+              <span class="terminal-counter" id="terminalMeta">0 tool calls</span>
+            </div>
+            <div class="terminal-body" id="terminalLogBody">
+              <div class="log-entry log-system">[00:00.00] Orchestrator waiting for task dispatch...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results & Intelligence Workspace -->
+      <section class="results-section" id="resultsSection" style="display: none;">
+        <!-- Tab Navigation -->
+        <div class="docket-tabs">
+          <button class="docket-tab-btn active" data-tab="tab-report">
+            <span class="tab-glyph">📄</span>
+            <span>Cited Intelligence Report</span>
+          </button>
+          <button class="docket-tab-btn" data-tab="tab-claims">
+            <span class="tab-glyph">📑</span>
+            <span>Claim Evidence Matrix</span>
+            <span class="tab-counter-chip" id="claimsCountBadge">0</span>
+          </button>
+          <button class="docket-tab-btn" data-tab="tab-conflicts">
+            <span class="tab-glyph">⚖</span>
+            <span>Conflict Radar</span>
+            <span class="tab-counter-chip chip-conflict" id="conflictsCountBadge">0</span>
+          </button>
+          <button class="docket-tab-btn" data-tab="tab-sources">
+            <span class="tab-glyph">🌐</span>
+            <span>Sources & Credibility</span>
+            <span class="tab-counter-chip" id="sourcesCountBadge">0</span>
+          </button>
+          <button class="docket-tab-btn" data-tab="tab-trace">
+            <span class="tab-glyph">◈</span>
+            <span>Plan & Tool Audit</span>
+          </button>
+        </div>
+
+        <!-- Tab 1: Cited Report -->
+        <div class="tab-pane active" id="tab-report">
+          <div class="report-action-bar">
+            <div class="report-meta-tags">
+              <span class="report-meta-chip" id="reportGeneratedTime">Generated: --:--:--</span>
+              <span class="report-meta-chip" id="reportSourcesAttributed">0 Sources Cited</span>
+            </div>
+            <div class="report-button-group">
+              <button class="report-btn" id="btnCopyReport">
+                <span>Copy Markdown</span>
+              </button>
+              <button class="report-btn report-btn-accent" id="btnDownloadReport">
+                <span>Download Report (.md)</span>
+              </button>
+            </div>
+          </div>
+          <div class="docket-report-card markdown-body" id="reportContentContainer">
+            <div class="loading-state">Synthesizing multi-source intelligence report...</div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Claims Matrix -->
+        <div class="tab-pane" id="tab-claims">
+          <div class="claims-control-strip">
+            <div class="stance-filters">
+              <span class="strip-label">Filter Stance:</span>
+              <button class="stance-btn active" data-stance="all">All</button>
+              <button class="stance-btn" data-stance="supports">Supports / Corroborates</button>
+              <button class="stance-btn" data-stance="refutes">Refutes / Critical</button>
+              <button class="stance-btn" data-stance="conditional">Conditional</button>
+              <button class="stance-btn" data-stance="neutral">Neutral</button>
+            </div>
+            <div class="claims-search-wrapper">
+              <input type="text" id="claimsFilterInput" placeholder="Filter claims by keyword or metric...">
+            </div>
+          </div>
+          <div class="claims-grid" id="claimsGridContainer">
+            <!-- Dynamically populated claim cards -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Conflict Radar -->
+        <div class="tab-pane" id="tab-conflicts">
+          <div class="conflict-alert-banner" id="conflictsOverviewBanner">
+            <div class="conflict-banner-glyph">⚖</div>
+            <div class="conflict-banner-details">
+              <h3>Factual Contradictions & Divergent Metrics Identified</h3>
+              <p id="conflictsSummaryText">The arbiter compared claims across all consulted sources and isolated direct statistical contradictions, timeline discrepancies, and methodological variations.</p>
+            </div>
+          </div>
+          <div class="conflicts-list" id="conflictsListContainer">
+            <!-- Dynamically populated conflict cards -->
+          </div>
+        </div>
+
+        <!-- Tab 4: Sources & Credibility -->
+        <div class="tab-pane" id="tab-sources">
+          <div class="sources-list" id="sourcesListContainer">
+            <!-- Dynamically populated source cards -->
+          </div>
+        </div>
+
+        <!-- Tab 5: Plan & Tool Trace -->
+        <div class="tab-pane" id="tab-trace">
+          <div class="trace-workspace">
+            <div class="trace-block">
+              <div class="trace-block-header">
+                <span class="block-glyph">◈</span>
+                <h3>Autonomous Decomposition & Investigation Plan</h3>
+              </div>
+              <div class="plan-card" id="planDetailsContainer">
+                <!-- Dynamically populated plan -->
+              </div>
+            </div>
+
+            <div class="trace-block">
+              <div class="trace-block-header">
+                <span class="block-glyph">◈</span>
+                <h3>Controlled Tool Invocations Audit Log</h3>
+              </div>
+              <div class="audit-table-wrapper">
+                <table class="audit-table">
+                  <thead>
+                    <tr>
+                      <th>TIMESTAMP</th>
+                      <th>TOOL INVOCATION</th>
+                      <th>INPUT PARAMETERS</th>
+                      <th>OUTPUT SUMMARY</th>
+                      <th>LATENCY</th>
+                    </tr>
+                  </thead>
+                  <tbody id="toolAuditTableBody">
+                    <!-- Tool log rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Citation Hover Tooltip Popup -->
+    <div class="citation-tooltip" id="citationTooltip">
+      <div class="tooltip-header">
+        <span class="tooltip-badge" id="ttBadge">[1]</span>
+        <span class="tooltip-title" id="ttTitle">Source Title</span>
+      </div>
+      <div class="tooltip-domain" id="ttDomain">nature.com</div>
+      <blockquote class="tooltip-quote" id="ttQuote">"Key excerpt from source..."</blockquote>
+      <a class="tooltip-link" id="ttLink" href="#" target="_blank" rel="noopener">Visit Original Source →</a>
+    </div>
+
+    <!-- Quick Fact-Check Modal -->
+    <div class="modal-backdrop" id="factCheckModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-row">
+            <span class="modal-glyph">⚡</span>
+            <h3>Rapid Claim Verifier</h3>
+          </div>
+          <button class="btn-close" id="btnCloseFactCheck">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">Test an isolated assertion against live multi-source web evidence and get a calibrated verdict with source attribution.</p>
+          <div class="prompt-box prompt-box-modal">
+            <textarea id="singleClaimInput" rows="2" placeholder="e.g. Electric vehicles produce more lifetime greenhouse emissions than internal combustion vehicles"></textarea>
+          </div>
+          <button class="action-btn-primary" id="btnRunQuickCheck" style="margin-top: 14px; width: 100%;">
+            <span>VERIFY CLAIM</span>
+          </button>
+          
+          <div class="quick-check-result" id="quickCheckResult" style="display: none; margin-top: 18px;">
+            <div class="verdict-banner" id="qcVerdictBanner">
+              <span class="verdict-label">VERDICT:</span>
+              <span class="verdict-tag" id="qcVerdictTag">DISPUTED</span>
+              <span class="confidence-tag" id="qcConfidenceTag">Confidence: 85%</span>
+            </div>
+            <p id="qcSummaryText" class="qc-summary"></p>
+            <div class="qc-sources" id="qcSourcesList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-backdrop" id="settingsModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-row">
+            <span class="modal-glyph">⚙</span>
+            <h3>Engine Configuration</h3>
+          </div>
+          <button class="btn-close" id="btnCloseSettings">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-field">
+            <label class="field-label">Active LLM Provider</label>
+            <select id="cfgProvider" class="field-select">
+              <option value="groq">Groq (Ultra-fast, Llama-3.3-70b-versatile)</option>
+              <option value="nvidia">NVIDIA AI Endpoints (meta/llama-3.1-70b-instruct)</option>
+              <option value="simulated">Demonstration / Offline Mode (Zero configuration)</option>
+            </select>
+          </div>
+
+          <div class="form-field" id="groupGroq">
+            <label class="field-label">Groq API Key</label>
+            <input type="password" id="cfgGroqKey" class="field-input" placeholder="gsk_...">
+            <span class="field-help">Powered by langchain-groq with structured output enforcement.</span>
+          </div>
+
+          <div class="form-field" id="groupNvidia">
+            <label class="field-label">NVIDIA API Key</label>
+            <input type="password" id="cfgNvidiaKey" class="field-input" placeholder="nvapi-...">
+            <span class="field-help">Powered by langchain-nvidia-ai-endpoints.</span>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">Tavily Search API Key (Optional)</label>
+            <input type="password" id="cfgTavilyKey" class="field-input" placeholder="tvly-...">
+            <span class="field-help">DuckDuckGo and Wikipedia search work out of the box without any key.</span>
+          </div>
+
+          <div class="modal-footer-actions">
+            <button class="nav-btn" id="btnCancelSettings">Cancel</button>
+            <button class="action-btn-primary" id="btnSaveSettings">Save Engine Config</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
